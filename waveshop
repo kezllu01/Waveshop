@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Beach | Coastal Essentials</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        ocean: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            300: '#7dd3fc',
+                            500: '#0ea5e9',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        },
+                        sand: {
+                            100: '#fdf6e3',
+                            200: '#eee8d5',
+                        },
+                        coral: {
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'wave': 'wave 2s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f0f9ff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #7dd3fc;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0ea5e9;
+        }
+        
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .wave-bg {
+            background: radial-gradient(circle at top left, #e0f2fe, transparent),
+                        radial-gradient(circle at bottom right, #7dd3fc, transparent);
+        }
+
+        /* Chat Animations */
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .message-anim {
+            animation: slideInUp 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-ocean-50 text-slate-800 font-sans antialiased relative overflow-x-hidden min-h-screen flex flex-col">
+
+    <!-- Notifications Container -->
+    <div id="toast-container" class="fixed top-24 right-5 z-50 flex flex-col gap-2"></div>
+
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full z-40 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="p-2 bg-gradient-to-tr from-ocean-500 to-teal-400 rounded-lg text-white">
+                        <i data-lucide="waves" class="w-6 h-6"></i>
+                    </div>
+                    <span class="font-bold text-2xl tracking-tight text-ocean-900">Blue<span class="text-ocean-500">Beach</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#new" class="text-slate-600 hover:text-ocean-600 font-medium transition">New Arrivals</a>
+                    <a href="#shop" class="text-slate-600 hover:text-ocean-600 font-medium transition">Shop</a>
+                    <a href="#collections" class="text-slate-600 hover:text-ocean-600 font-medium transition">Collections</a>
+                </div>
+
+                <!-- Cart Button -->
+                <button onclick="toggleCart()" class="relative p-2 hover:bg-ocean-100 rounded-full transition group">
+                    <i data-lucide="shopping-bag" class="w-6 h-6 text-slate-700 group-hover:text-ocean-700"></i>
+                    <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-coral-500 rounded-full shadow-md scale-0 transition-transform duration-200">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div class="absolute inset-0 z-0 bg-gradient-to-b from-ocean-100 to-white"></div>
+        <!-- Decorative blobs -->
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-ocean-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-teal-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style="animation-delay: 2s"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-3xl mx-auto">
+                <span class="inline-block py-1 px-3 rounded-full bg-ocean-100 text-ocean-700 text-sm font-semibold mb-6 tracking-wide uppercase">Summer Sale Live Now</span>
+                <h1 class="text-5xl md:text-7xl font-bold text-slate-900 leading-tight mb-6">
+                    Ride the <span class="text-transparent bg-clip-text bg-gradient-to-r from-ocean-500 to-teal-400">Wave</span> of Style
+                </h1>
+                <p class="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed">
+                    Premium coastal gear for your next adventure. Sustainable materials, ocean-inspired designs, and built for the sun.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="document.getElementById('shop').scrollIntoView({behavior: 'smooth'})" class="px-8 py-4 bg-ocean-600 hover:bg-ocean-700 text-white rounded-full font-semibold shadow-lg shadow-ocean-300/50 transition transform hover:-translate-y-1">
+                        Shop Collection
+                    </button>
+                    <button class="px-8 py-4 bg-white text-ocean-700 border border-ocean-200 hover:bg-ocean-50 rounded-full font-semibold transition">
+                        View Lookbook
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Filter Section -->
+    <section class="py-8 bg-white border-b border-ocean-100" id="shop">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-center gap-4">
+                <button class="filter-btn active px-6 py-2 rounded-full text-sm font-medium bg-ocean-900 text-white transition shadow-md" data-category="all">All</button>
+                <button class="filter-btn px-6 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:border-ocean-300 hover:text-ocean-600 transition" data-category="wear">Beachwear</button>
+                <button class="filter-btn px-6 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:border-ocean-300 hover:text-ocean-600 transition" data-category="gear">Gear</button>
+                <button class="filter-btn px-6 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200 hover:border-ocean-300 hover:text-ocean-600 transition" data-category="accessories">Accessories</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Product Grid -->
+    <main class="flex-grow bg-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Products will be injected here by JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Features Section -->
+    <section class="bg-ocean-50 py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+                <div class="p-6 bg-white rounded-2xl shadow-sm hover:shadow-md transition">
+                    <div class="w-14 h-14 mx-auto bg-ocean-100 rounded-full flex items-center justify-center text-ocean-600 mb-4">
+                        <i data-lucide="truck" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Free Shipping</h3>
+                    <p class="text-slate-500">On all orders over $100. We ship worldwide with tracked delivery.</p>
+                </div>
+                <div class="p-6 bg-white rounded-2xl shadow-sm hover:shadow-md transition">
+                    <div class="w-14 h-14 mx-auto bg-ocean-100 rounded-full flex items-center justify-center text-ocean-600 mb-4">
+                        <i data-lucide="shield-check" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Ocean Guarantee</h3>
+                    <p class="text-slate-500">30-day return policy. If you don't love it, send it back for free.</p>
+                </div>
+                <div class="p-6 bg-white rounded-2xl shadow-sm hover:shadow-md transition">
+                    <div class="w-14 h-14 mx-auto bg-ocean-100 rounded-full flex items-center justify-center text-ocean-600 mb-4">
+                        <i data-lucide="leaf" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">Eco-Friendly</h3>
+                    <p class="text-slate-500">1% of all sales go to ocean conservation projects.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-ocean-900 text-white pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center gap-2 mb-6">
+                        <i data-lucide="waves" class="w-6 h-6 text-ocean-300"></i>
+                        <span class="font-bold text-xl">BlueBeach</span>
+                    </div>
+                    <p class="text-ocean-200 text-sm leading-relaxed">
+                        Crafting the perfect beach experience with sustainable, high-quality gear for sun seekers everywhere.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-6">Shop</h4>
+                    <ul class="space-y-3 text-ocean-200 text-sm">
+                        <li><a href="#" class="hover:text-white transition">New Arrivals</a></li>
+                        <li><a href="#" class="hover:text-white transition">Best Sellers</a></li>
+                        <li><a href="#" class="hover:text-white transition">Accessories</a></li>
+                        <li><a href="#" class="hover:text-white transition">Sale</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-6">Help</h4>
+                    <ul class="space-y-3 text-ocean-200 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Shipping & Returns</a></li>
+                        <li><a href="#" class="hover:text-white transition">Size Guide</a></li>
+                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-6">Stay in the Loop</h4>
+                    <div class="flex flex-col gap-4">
+                        <input type="email" placeholder="Enter your email" class="bg-ocean-800 border-none rounded-lg px-4 py-3 text-sm text-white focus:ring-2 focus:ring-ocean-400 outline-none">
+                        <button class="bg-ocean-500 hover:bg-ocean-400 text-white px-4 py-3 rounded-lg text-sm font-bold transition">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-ocean-800 pt-8 text-center text-ocean-400 text-sm">
+                <p>&copy; 2024 Blue Beach Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shopping Cart Sidebar (Off-canvas) -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0" onclick="toggleCart()"></div>
+    
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full max-w-md bg-white z-50 transform translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col">
+        <!-- Cart Header -->
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
+            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                Your Cart
+                <span id="cart-header-count" class="bg-ocean-100 text-ocean-700 text-xs font-bold px-2 py-1 rounded-full">0</span>
+            </h2>
+            <button onclick="toggleCart()" class="p-2 hover:bg-gray-100 rounded-full transition">
+                <i data-lucide="x" class="w-6 h-6 text-gray-500"></i>
+            </button>
+        </div>
+
+        <!-- Cart Items Area -->
+        <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Empty State -->
+            <div id="cart-empty-state" class="h-full flex flex-col items-center justify-center text-center text-slate-400">
+                <i data-lucide="shopping-cart" class="w-16 h-16 mb-4 text-slate-200"></i>
+                <p class="text-lg font-medium text-slate-500">Your cart is empty</p>
+                <p class="text-sm">Looks like you haven't added any beach gear yet.</p>
+                <button onclick="toggleCart()" class="mt-6 px-6 py-2 bg-ocean-100 text-ocean-700 font-semibold rounded-full hover:bg-ocean-200 transition">
+                    Start Shopping
+                </button>
+            </div>
+            <!-- Cart Items will be injected here -->
+        </div>
+
+        <!-- Cart Footer -->
+        <div class="p-6 border-t border-gray-100 bg-gray-50">
+            <div class="space-y-3 mb-6">
+                <div class="flex justify-between text-slate-600">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal" class="font-medium">$0.00</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                    <span>Shipping</span>
+                    <span class="text-green-600 font-medium">Free</span>
+                </div>
+                <div class="flex justify-between text-xl font-bold text-slate-800 pt-3 border-t border-gray-200">
+                    <span>Total</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+            </div>
+            <button onclick="checkout()" class="w-full py-4 bg-ocean-600 hover:bg-ocean-700 text-white font-bold rounded-xl shadow-lg shadow-ocean-300/50 transition transform active:scale-95 flex items-center justify-center gap-2">
+                Checkout <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- AI Chat Bot Widget -->
+    <div id="chat-widget" class="fixed bottom-6 left-6 z-50 flex flex-col items-start gap-4 pointer-events-none">
+        
+        <!-- Chat Window -->
+        <div id="chat-window" class="w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-ocean-100 overflow-hidden transition-all duration-300 transform origin-bottom-left scale-0 opacity-0 pointer-events-auto flex flex-col max-h-[500px]">
+            <div class="bg-gradient-to-r from-ocean-600 to-teal-500 p-4 flex justify-between items-center text-white">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-sm">Beach Bot</h3>
+                        <p class="text-xs text-ocean-100">AI Personal Shopper</p>
+                    </div>
+                </div>
+                <button onclick="toggleChat()" class="p-1 hover:bg-white/20 rounded-full transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            
+            <div id="chat-messages" class="flex-grow p-4 overflow-y-auto space-y-4 bg-slate-50 min-h-[300px]">
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 bg-ocean-100 rounded-full flex-shrink-0 flex items-center justify-center text-ocean-600">
+                        <i data-lucide="bot" class="w-4 h-4"></i>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-sm text-slate-600 border border-slate-100">
+                        Hi there! 🌊 I'm your personal shopper. Looking for sunglasses, a gift, or style advice? Ask away!
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 bg-white border-t border-slate-100">
+                <form onsubmit="handleChatSubmit(event)" class="relative">
+                    <input type="text" id="chat-input" placeholder="Ask about products..." class="w-full pl-4 pr-12 py-3 bg-slate-50 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-ocean-300 border border-transparent focus:border-ocean-200 transition">
+                    <button type="submit" id="chat-send-btn" class="absolute right-2 top-1.5 p-1.5 bg-ocean-500 text-white rounded-full hover:bg-ocean-600 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toggle Button -->
+        <button onclick="toggleChat()" class="pointer-events-auto w-14 h-14 bg-gradient-to-r from-ocean-600 to-teal-500 rounded-full shadow-xl shadow-ocean-500/30 text-white flex items-center justify-center hover:scale-110 transition-transform duration-300 group">
+            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+            <i data-lucide="message-circle" class="w-7 h-7 group-hover:rotate-12 transition-transform"></i>
+        </button>
+    </div>
+
+    <!-- Product Details Modal -->
+    <div id="product-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeProductModal()"></div>
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 p-2 bg-white/80 hover:bg-white rounded-full z-20 shadow-sm">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="md:w-1/2 bg-gray-100 h-64 md:h-auto relative group">
+                 <img id="modal-img" src="" alt="" class="w-full h-full object-cover">
+                 <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+            <div class="md:w-1/2 p-8 flex flex-col bg-white">
+                <div class="flex-grow overflow-y-auto">
+                    <span id="modal-cat" class="text-xs font-bold text-ocean-500 uppercase tracking-wider mb-2 block">Category</span>
+                    <h2 id="modal-title" class="text-2xl font-bold text-slate-900 mb-2">Product Title</h2>
+                    <div id="modal-price" class="text-xl font-semibold text-slate-700 mb-4">$0.00</div>
+                    
+                    <div class="relative mb-6">
+                        <p id="modal-desc" class="text-slate-600 text-sm leading-relaxed transition-all duration-500">
+                            Description goes here.
+                        </p>
+                        <!-- AI Feature 2: Description Enhancer -->
+                        <button id="ai-desc-btn" class="mt-3 text-xs font-bold text-purple-600 flex items-center gap-1 hover:text-purple-800 transition bg-purple-50 px-3 py-1.5 rounded-full w-max border border-purple-100 hover:border-purple-200">
+                            <i data-lucide="sparkles" class="w-3 h-3"></i> Get AI Vibe Check
+                        </button>
+                    </div>
+                </div>
+                <button id="modal-add-btn" class="w-full py-3 bg-ocean-900 text-white rounded-xl hover:bg-ocean-800 transition font-medium shadow-lg shadow-ocean-900/20">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const apiKey = ""; // Runtime will provide this
+
+        // --- DATA ---
+        const products = [
+            {
+                id: 1,
+                name: "Azure Horizon Shades",
+                price: 129.00,
+                category: "accessories",
+                image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80",
+                description: "Polarized lenses with a classic frame, perfect for cutting the glare on the open water."
+            },
+            {
+                id: 2,
+                name: "Coastal Breeze Linen Shirt",
+                price: 85.00,
+                category: "wear",
+                image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80",
+                description: "Lightweight, breathable 100% linen shirt in our signature ocean teal."
+            },
+            {
+                id: 3,
+                name: "Deep Dive Pro Watch",
+                price: 299.00,
+                category: "accessories",
+                image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=800&q=80",
+                description: "Water-resistant up to 200m. The ultimate companion for underwater exploration."
+            },
+            {
+                id: 4,
+                name: "Seaside Canvas Tote",
+                price: 45.00,
+                category: "gear",
+                image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80",
+                description: "Durable organic cotton canvas with enough room for all your beach essentials."
+            },
+            {
+                id: 5,
+                name: "Coral Reef Swim Trunks",
+                price: 59.00,
+                category: "wear",
+                image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80",
+                description: "Quick-dry fabric with a vibrant pattern inspired by the Great Barrier Reef."
+            },
+            {
+                id: 6,
+                name: "Driftwood Surfboard",
+                price: 650.00,
+                category: "gear",
+                image: "https://images.unsplash.com/photo-1531722569936-825d3fa91b5f?auto=format&fit=crop&w=800&q=80",
+                description: "Hand-shaped performance board suitable for intermediate to advanced riders."
+            },
+            {
+                id: 7,
+                name: "Mineral Sunscreen SPF 50",
+                price: 24.00,
+                category: "accessories",
+                image: "https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&w=800&q=80",
+                description: "Reef-safe, zinc-based protection that won't harm the ecosystem."
+            },
+            {
+                id: 8,
+                name: "Thermal Hydro Flask",
+                price: 38.00,
+                category: "gear",
+                image: "https://images.unsplash.com/photo-1602143407151-01114195bc51?auto=format&fit=crop&w=800&q=80",
+                description: "Keeps your water ice-cold for 24 hours, even under the blazing sun."
+            }
+        ];
+
+        // --- STATE ---
+        let cart = [];
+        let currentFilter = 'all';
+        let isChatOpen = false;
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderProducts();
+            setupFilters();
+        });
+
+        // --- RENDER PRODUCTS ---
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+
+            const filteredProducts = currentFilter === 'all' 
+                ? products 
+                : products.filter(p => p.category === currentFilter);
+
+            filteredProducts.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-100 flex flex-col h-full";
+                
+                const fallbackImage = `https://placehold.co/600x400/e0f2fe/0ea5e9?text=${encodeURIComponent(product.name)}`;
+
+                card.innerHTML = `
+                    <div class="relative h-64 overflow-hidden bg-gray-200 cursor-pointer" onclick="openProductModal(${product.id})">
+                        <img src="${product.image}" 
+                             alt="${product.name}" 
+                             onerror="this.src='${fallbackImage}'"
+                             class="w-full h-full object-cover transform group-hover:scale-105 transition duration-700">
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition duration-300"></div>
+                        <button onclick="event.stopPropagation(); addToCart(${product.id})" class="absolute bottom-4 right-4 bg-white p-3 rounded-full shadow-lg text-slate-800 hover:bg-ocean-500 hover:text-white transition transform translate-y-12 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 duration-300">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="text-xs font-bold text-ocean-500 mb-2 uppercase tracking-wide">${product.category}</div>
+                        <h3 class="font-bold text-slate-800 text-lg mb-2 group-hover:text-ocean-600 transition cursor-pointer" onclick="openProductModal(${product.id})">${product.name}</h3>
+                        <p class="text-slate-500 text-sm line-clamp-2 mb-4 flex-grow">${product.description}</p>
+                        <div class="flex items-center justify-between mt-auto">
+                            <span class="text-xl font-bold text-slate-900">$${product.price.toFixed(2)}</span>
+                            <button onclick="addToCart(${product.id})" class="text-sm font-semibold text-ocean-600 hover:text-ocean-800 transition">Add to Cart</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // --- FILTERS ---
+        function setupFilters() {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    buttons.forEach(b => {
+                        b.classList.remove('bg-ocean-900', 'text-white', 'shadow-md');
+                        b.classList.add('bg-white', 'text-slate-600');
+                    });
+                    btn.classList.remove('bg-white', 'text-slate-600');
+                    btn.classList.add('bg-ocean-900', 'text-white', 'shadow-md');
+                    
+                    currentFilter = btn.dataset.category;
+                    renderProducts();
+                });
+            });
+        }
+
+        // --- CART FUNCTIONALITY ---
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            const body = document.body;
+
+            if (sidebar.classList.contains('translate-x-full')) {
+                sidebar.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+                body.style.overflow = 'hidden';
+            } else {
+                sidebar.classList.add('translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+                body.style.overflow = '';
+            }
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCartUI();
+            showToast(`Added ${product.name} to cart`);
+            
+            const sidebar = document.getElementById('cart-sidebar');
+            if (sidebar.classList.contains('translate-x-full')) {
+                toggleCart();
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+        }
+
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    updateCartUI();
+                }
+            }
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items-container');
+            const emptyState = document.getElementById('cart-empty-state');
+            const countBadge = document.getElementById('cart-count');
+            const headerCount = document.getElementById('cart-header-count');
+            const subtotalEl = document.getElementById('cart-subtotal');
+            const totalEl = document.getElementById('cart-total');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            countBadge.innerText = totalItems;
+            headerCount.innerText = totalItems;
+            
+            if (totalItems > 0) {
+                countBadge.classList.remove('scale-0');
+            } else {
+                countBadge.classList.add('scale-0');
+            }
+
+            if (cart.length === 0) {
+                container.innerHTML = '';
+                container.appendChild(emptyState);
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                container.innerHTML = ''; 
+                container.appendChild(emptyState);
+
+                cart.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = "flex gap-4 animate-fadeIn";
+                    itemEl.innerHTML = `
+                        <div class="w-20 h-20 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
+                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-grow flex flex-col justify-between">
+                            <div>
+                                <h4 class="font-semibold text-slate-800 line-clamp-1">${item.name}</h4>
+                                <p class="text-sm text-slate-500">$${item.price.toFixed(2)}</p>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                <div class="flex items-center border border-gray-200 rounded-lg">
+                                    <button onclick="updateQuantity(${item.id}, -1)" class="p-1 px-2 hover:bg-gray-100 text-slate-600 transition rounded-l-lg">-</button>
+                                    <span class="text-sm font-medium w-8 text-center">${item.quantity}</span>
+                                    <button onclick="updateQuantity(${item.id}, 1)" class="p-1 px-2 hover:bg-gray-100 text-slate-600 transition rounded-r-lg">+</button>
+                                </div>
+                                <button onclick="removeFromCart(${item.id})" class="text-xs text-red-500 hover:text-red-700 font-medium underline">Remove</button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(itemEl);
+                });
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            subtotalEl.innerText = '$' + subtotal.toFixed(2);
+            totalEl.innerText = '$' + subtotal.toFixed(2);
+        }
+
+        function checkout() {
+            if (cart.length === 0) return;
+            const btn = document.querySelector('#cart-sidebar button[onclick="checkout()"]');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin w-5 h-5"></i> Processing...`;
+            btn.disabled = true;
+
+            setTimeout(() => {
+                showToast("Order placed successfully! 🌊");
+                cart = [];
+                updateCartUI();
+                toggleCart();
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                lucide.createIcons();
+            }, 1500);
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = "bg-ocean-900 text-white px-6 py-4 rounded-xl shadow-lg transform transition-all duration-300 translate-x-full flex items-center gap-3";
+            toast.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-green-400"></i> <span class="font-medium">${message}</span>`;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-x-full');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-full');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- MODAL & AI DESC ---
+        function openProductModal(id) {
+            const product = products.find(p => p.id === id);
+            if(!product) return;
+
+            document.getElementById('modal-img').src = product.image;
+            document.getElementById('modal-cat').innerText = product.category;
+            document.getElementById('modal-title').innerText = product.name;
+            document.getElementById('modal-price').innerText = '$' + product.price.toFixed(2);
+            document.getElementById('modal-desc').innerText = product.description;
+            
+            // AI Feature: Vibe Check (Description Enhancer)
+            const aiBtn = document.getElementById('ai-desc-btn');
+            aiBtn.innerHTML = `<i data-lucide="sparkles" class="w-3 h-3"></i> Get AI Vibe Check`;
+            aiBtn.disabled = false;
+            aiBtn.onclick = async () => {
+                aiBtn.disabled = true;
+                aiBtn.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Catching vibes...`;
+                
+                try {
+                    const prompt = `Write a captivating, sensory-rich, 2-sentence description for this product: "${product.name}". It is a ${product.category}. Capture the feeling of the ocean, summer, and freedom. Keep it under 40 words.`;
+                    
+                    const response = await callGemini(prompt);
+                    
+                    // Typing effect
+                    const descEl = document.getElementById('modal-desc');
+                    descEl.style.opacity = '0';
+                    setTimeout(() => {
+                        descEl.innerText = response;
+                        descEl.style.opacity = '1';
+                    }, 300);
+
+                    aiBtn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i> Vibes Checked`;
+                } catch (error) {
+                    console.error(error);
+                    aiBtn.innerHTML = `Error. Try again.`;
+                    aiBtn.disabled = false;
+                }
+                lucide.createIcons();
+            };
+
+            const btn = document.getElementById('modal-add-btn');
+            btn.onclick = () => {
+                addToCart(product.id);
+                closeProductModal();
+            };
+
+            const modal = document.getElementById('product-modal');
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        // --- AI CHATBOT FUNCTIONALITY ---
+        function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            isChatOpen = !isChatOpen;
+            if (isChatOpen) {
+                chatWindow.classList.remove('scale-0', 'opacity-0');
+                // Focus input after transition
+                setTimeout(() => document.getElementById('chat-input').focus(), 300);
+            } else {
+                chatWindow.classList.add('scale-0', 'opacity-0');
+            }
+        }
+
+        async function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add User Message
+            addChatMessage(message, 'user');
+            input.value = '';
+            
+            const sendBtn = document.getElementById('chat-send-btn');
+            sendBtn.disabled = true;
+
+            // Loading State
+            const loadingId = addChatMessage("Thinking...", 'bot', true);
+
+            try {
+                // System Context: Feed the product catalog to the AI
+                const systemContext = `You are "Beach Bot", a helpful, laid-back personal shopper for "Blue Beach", a coastal lifestyle shop. 
+                Here is our current product catalog JSON: ${JSON.stringify(products)}. 
+                
+                Rules:
+                1. Only recommend products from this list.
+                2. Be friendly, use occasional wave/beach emojis (🌊, 🏖️, 🐚).
+                3. Keep answers concise (under 3 sentences).
+                4. If asked about prices, quote the exact price from the JSON.
+                5. If the user asks for something we don't have, politely suggest a related item from the list or say we're out of stock.
+                
+                User Query: ${message}`;
+
+                const response = await callGemini(systemContext);
+                
+                // Remove loading, add real response
+                document.getElementById(loadingId).remove();
+                addChatMessage(response, 'bot');
+
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                addChatMessage("Sorry, the tide is high and I can't connect right now! 🌊 Try again later.", 'bot');
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+
+        function addChatMessage(text, sender, isLoading = false) {
+            const container = document.getElementById('chat-messages');
+            const id = 'msg-' + Date.now();
+            
+            const isBot = sender === 'bot';
+            const align = isBot ? 'justify-start' : 'justify-end';
+            const bg = isBot ? 'bg-white text-slate-600 border border-slate-100' : 'bg-ocean-500 text-white';
+            const radius = isBot ? 'rounded-tl-none' : 'rounded-tr-none';
+            const icon = isBot ? `<div class="w-8 h-8 bg-ocean-100 rounded-full flex-shrink-0 flex items-center justify-center text-ocean-600"><i data-lucide="bot" class="w-4 h-4"></i></div>` : '';
+
+            const html = `
+                <div id="${id}" class="flex gap-3 ${align} message-anim">
+                    ${isBot ? icon : ''}
+                    <div class="${bg} p-3 rounded-2xl ${radius} shadow-sm text-sm max-w-[80%] ${isLoading ? 'animate-pulse' : ''}">
+                        ${text}
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', html);
+            container.scrollTop = container.scrollHeight;
+            lucide.createIcons();
+            return id;
+        }
+
+        // --- GEMINI API CALL ---
+        async function callGemini(promptText) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: promptText
+                        }]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+    </script>
+</body>
+</html>
